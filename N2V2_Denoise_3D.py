@@ -93,4 +93,34 @@ print("Parameters set.")
 
 #! 4. Prepare the model for training
 patch_dims = (patch_height, patch_size, patch_size)
+datagen = N2V_DataGenerator()
 patches = datagen.generate_patches_from_list(imgs, shape=patch_dims, augment=data_augmentation)
+threshold = int(len(patches)) * (percent_validation / 100)
+X = patches[threshold:]
+X_val = patches[:threshold]
+
+if number_of_steps == 0:
+    number_of_steps = int(X.shape[0] / batch_size) + 1
+
+config = N2VConfig(
+    X,
+    unet_kern_size=3,
+    train_steps_per_epoch=number_of_steps,
+    train_epochs=number_of_epochs,
+    train_loss="mse",
+    batch_norm=True,
+    train_batch_size=batch_size,
+    n2v_perc_pix=0.198,
+    n2v_patch_shape=patch_dims,
+    n2v_manipulator="median",
+    train_learning_rate=initial_learning_rate,
+    n2v_neighborhood_radius=5,
+    lurpool=True,
+    skip_skipone=True,
+)
+
+model = N2V(config=config, name=model_name, basedir=model_results)
+if use_pretrained_model:
+    model.load_weights(model_file_path)
+    print("Pretrained model loaded.")
+print("Configuration complete. Ready to train.")
