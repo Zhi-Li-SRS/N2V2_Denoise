@@ -1,13 +1,9 @@
-import csv
 import os
-import shutil
 import sys
 import time
 import warnings
-import zipfile
 from random import choice
 
-import matplotlib.pyplot as plt
 import numpy as np
 import skimage
 import tensorflow as tf
@@ -19,27 +15,13 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 from tifffile import imread, imsave
 
-#! 1. Define the parameters for the training of the N2V model
-use_pretrained_model = False
-pretrained_model_path = ""
-# obtain location of the pretrained model:
-if use_pretrained_model:
-    model_file_path = pretrained_model_path
-    if not os.path.exists(model_file_path):
-        print("Model does not exist.")
-        use_pretrained_model = False
-    else:
-        pass
+#! 1. Define the source of the training data
+if not sys.warnoptions:
+    warnings.filterwarnings("ignore")
 
-if use_pretrained_model:
-    print("Model", os.path.basename(pretrained_model_path), "was successfully loaded")
-else:
-    print("A pretrained model will not be used.")
-
-#! 2. Define the source of the training data
 training_source = "images"
 model_results = "model_results"
-model_name = "N2V2"
+model_name = "n2v2_3D_flr"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type
@@ -56,7 +38,7 @@ datagen = N2V_DataGenerator()
 imgs = datagen.load_imgs_from_directory(directory=training_source, dims="ZYX")
 print("Images loaded successfully")
 
-#! 3. Define the parameters for the training of the N2V model
+#! 2. Define the parameters for the training of the N2V model
 number_of_epochs = 50
 patch_size = 64
 patch_height = 4
@@ -85,42 +67,62 @@ if not patch_height % 4 == 0:
     print("Patch height not divisible by 4; patch height modified.")
 
 batch_size = 128
-number_of_steps = 100
 initial_learning_rate = 0.0004
 percent_validation = 10
-data_augmentation = True
+data_augmentation = False
 print("Parameters set.")
+
+#! 3. Using weights from pre-trained model as initial weights
+use_pretrained_model = False
+pretrained_model_choice = "n2v2_3D_flr"
+weights_choice = "last"
+pretrained_model_path = "model_results"
+if use_pretrained_model:
+    if pretrained_model_choice == pretrained_model_choice:
+        h5_file_path = os.path.join(pretrained_model_path, "weights_" + weights_choice + ".weights.h5")
+    if not os.path.exists(h5_file_path):
+        print("WARNING: weights_last.h5 pretrained model does not exist")
+        use_pretrained_model = False
+
 
 #! 4. Prepare the model for training
 patch_dims = (patch_height, patch_size, patch_size)
 datagen = N2V_DataGenerator()
-patches = datagen.generate_patches_from_list(imgs, shape=patch_dims, augment=data_augmentation)
-threshold = int(len(patches)) * (percent_validation / 100)
+patches = datagen.generate_patches_from_list(imgs, shape=patch_dims)
+threshold = int(len(patches) * (percent_validation / 100))
 X = patches[threshold:]
 X_val = patches[:threshold]
-
-if number_of_steps == 0:
-    number_of_steps = int(X.shape[0] / batch_size) + 1
 
 config = N2VConfig(
     X,
     unet_kern_size=3,
-    train_steps_per_epoch=number_of_steps,
+    train_steps_per_epoch=int(X.shape[0] / batch_size) + 1,
     train_epochs=number_of_epochs,
     train_loss="mse",
     batch_norm=True,
     train_batch_size=batch_size,
     n2v_perc_pix=0.198,
     n2v_patch_shape=patch_dims,
-    n2v_manipulator="median",
+    n2v_manipulator="uniform_withCP",
     train_learning_rate=initial_learning_rate,
+    single_net_per_channel=False,
     n2v_neighborhood_radius=5,
-    lurpool=True,
-    skip_skipone=True,
 )
+
+vars(config)
 
 model = N2V(config=config, name=model_name, basedir=model_results)
 if use_pretrained_model:
-    model.load_weights(model_file_path)
+    model.load_weights(h5_file_path)
     print("Pretrained model loaded.")
 print("Configuration complete. Ready to train.")
+
+#! 5. Train the model
+warnings.filterwarnings("ignore")
+start = time.time()
+history = model.train(X, X_val)
+model.export_TF(name="n2v for fluorescence denoising", test_img=X_val[0, ...], axes="ZYXC", patch_shape=patch_dims)
+
+print("Training Complete")
+print("Time Elapsed:", time.strftime("%H:%M:%S", time.gmtime(time.time() - start)))
+print("Model was successfully exported in folder:", model_results)
