@@ -39,7 +39,7 @@ imgs = datagen.load_imgs_from_directory(directory=training_source, dims="ZYX")
 print("Images loaded successfully")
 
 #! 2. Define the parameters for the training of the N2V model
-number_of_epochs = 50
+number_of_epochs = 200
 patch_size = 64
 patch_height = 4
 # check patch size:
@@ -121,7 +121,6 @@ print("Configuration complete. Ready to train.")
 warnings.filterwarnings("ignore")
 start = time.time()
 history = model.train(X, X_val)
-model.export_TF(name="n2v for fluorescence denoising", test_img=X_val[0, ...], axes="ZYXC", patch_shape=patch_dims)
 
 print("Training Complete")
 print("Time Elapsed:", time.strftime("%H:%M:%S", time.gmtime(time.time() - start)))

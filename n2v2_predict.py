@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import warnings
+from pathlib import Path
 from random import choice
 
 import numpy as np
@@ -18,8 +19,12 @@ from tifffile import imread, imsave
 model_name = "n2v2_3D_flr"
 model_results = "model_results"
 model = N2V(config=None, name=model_name, basedir=model_results)
-model.load_weights(os.path.join(model_results, "n2v2_3D_flr", "weights_last.h5"))
-img_path = "images/3_ku80_400mw_zoom4.tif"
-img = imread(img_path)
-pred = model.predict(img, axes="ZYX", n_tiles=(2, 4, 4))
-imsave("prediction/3_ku80_400mw_zoom4.tif", pred)
+n_tiles = (2, 4, 4)
+input_dir = Path("images")
+output_dir = Path("prediction")
+for r, d, f in os.walk(input_dir):
+    for file in f:
+        filename = os.path.basename(file)
+        img = imread(os.path.join(r, file))
+        pred = model.predict(img, axes="ZYX", n_tiles=n_tiles)
+        imsave(os.path.join(output_dir, filename), pred)
