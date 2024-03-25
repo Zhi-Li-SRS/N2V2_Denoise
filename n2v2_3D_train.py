@@ -19,9 +19,9 @@ from tifffile import imread, imsave
 if not sys.warnoptions:
     warnings.filterwarnings("ignore")
 
-training_source = "images"
+training_source = "train_images"
 model_results = "model_results"
-model_name = "n2v2_3D_flr"
+model_name = "n2v2_3D_srs"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type
@@ -39,7 +39,7 @@ imgs = datagen.load_imgs_from_directory(directory=training_source, dims="ZYX")
 print("Images loaded successfully")
 
 #! 2. Define the parameters for the training of the N2V model
-number_of_epochs = 200
+number_of_epochs = 150
 patch_size = 64
 patch_height = 4
 # check patch size:
