@@ -74,7 +74,7 @@ print("Parameters set.")
 
 #! 3. Using weights from pre-trained model as initial weights
 use_pretrained_model = False
-pretrained_model_choice = "n2v2_3D_flr"
+pretrained_model_choice = ""
 weights_choice = "last"
 pretrained_model_path = "model_results"
 if use_pretrained_model:
