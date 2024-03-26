@@ -1,1 +1,1 @@
-Deploy N2V2 for bio images denoising
+Deploy N2V2 for multimodal images denoising
