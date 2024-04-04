@@ -21,7 +21,7 @@ if not sys.warnoptions:
 
 training_source = "train_images"
 model_results = "model_results"
-model_name = "n2v2_2D_flr"
+model_name = "n2v2_2D_srs"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type

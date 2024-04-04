@@ -7,12 +7,12 @@ from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
 from tifffile import imread, imsave
 
-model_name = "n2v2_3D_srs"
 model_results = "model_results"
+model_name = "n2v2_3D_flr"
 model = N2V(config=None, name=model_name, basedir=model_results)
 n_tiles = (2, 4, 4)
-input_dir = os.path.join("input")
-output_dir = os.path.join("prediction")
+input_dir = "input"
+output_dir = "prediction"
 for r, d, f in os.walk(input_dir):
     for file in f:
         filename = os.path.basename(file)
