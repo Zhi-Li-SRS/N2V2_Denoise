@@ -20,8 +20,8 @@ if not sys.warnoptions:
     warnings.filterwarnings("ignore")
 
 training_source = "train_images"
-model_results = "model_results"
-model_name = "n2v2_3D_srs"
+model_results = "nanopillar_denoise"
+model_name = "n2v2_3d_srs"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type
