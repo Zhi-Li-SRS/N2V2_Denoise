@@ -17,7 +17,7 @@ from skimage.metrics import structural_similarity as ssim
 from tifffile import imread, imsave
 
 model_results = "nanopillar_denoise"
-model_name = "n2v2_2d_flr"
+model_name = "n2v2_2d_srs"
 model = N2V(config=None, name=model_name, basedir=model_results)
 n_tiles = (2, 1)
 input_dir = Path("images")

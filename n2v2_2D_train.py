@@ -21,7 +21,7 @@ if not sys.warnoptions:
 
 training_source = "train_images"
 model_results = "nanopillar_denoise"
-model_name = "n2v2_2d_srs"
+model_name = "n2v2_2d_flr"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type
@@ -35,11 +35,11 @@ else:
     sys.exit()
 # if pass, extract data
 datagen = N2V_DataGenerator()
-imgs = datagen.load_imgs_from_directory(directory=training_source, dims="ZYX")
+imgs = datagen.load_imgs_from_directory(directory=training_source, dims="YX")
 print("Images loaded successfully")
 
 #! 2. Define the parameters for the training of the N2V model
-number_of_epochs = 150
+number_of_epochs = 200
 patch_size = 64
 
 # check patch size:
