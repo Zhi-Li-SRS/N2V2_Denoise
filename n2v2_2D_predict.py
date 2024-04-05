@@ -20,8 +20,8 @@ model_results = "nanopillar_denoise"
 model_name = "n2v2_2d_srs"
 model = N2V(config=None, name=model_name, basedir=model_results)
 n_tiles = (2, 1)
-input_dir = Path("images")
-output_dir = Path("prediction")
+input_dir = "input"
+output_dir = "prediction"
 for r, d, f in os.walk(input_dir):
     for file in f:
         filename = os.path.basename(file)
