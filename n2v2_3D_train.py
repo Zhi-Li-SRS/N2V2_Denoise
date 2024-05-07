@@ -21,7 +21,7 @@ if not sys.warnoptions:
 
 training_source = "train_images"
 model_results = "nanopillar_denoise"
-model_name = "n2v2_3d_srs"
+model_name = "n2v2_3d_srs_flat"
 # call random image:
 random_img = choice(os.listdir(training_source))
 # check file type
